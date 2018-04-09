@@ -22,3 +22,6 @@ Route::get('delivery_request/{id}', 'DeliveryApiController@show');
 Route::post('delivery_request', 'DeliveryApiController@store');
 Route::put('delivery_request/{id}', 'DeliveryApiController@update');
 Route::delete('delivery_request/{id}', 'DeliveryApiController@delete');
+Route::post('delivery_request_transporter', 'DeliveryApiController@transporter');
+// client api route
+Route::post('client_registration_request', 'ClientApiController@Registration');

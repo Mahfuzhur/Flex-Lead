@@ -27,6 +27,14 @@ class DeliveryApiController extends Controller
             'code'=>'00000',
             'data'=>$article],201);
     }
+    public function transporter(Request $request)
+    {
+//        $tid = $request->header('tid');
+        $article = Delivery::select('id','receiverName','receiverPhone','geoStartLatitude','geoStartLongitude','geoEndLatitude','geoEndLongitude','weight')->where('deliveryTransporterId', 1)->get();
+        return response()->json([
+            'code'=>'0000',
+            'data'=>$article],200);
+    }
 
     public function store(Request $request)
     {
