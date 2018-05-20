@@ -9,7 +9,7 @@ class Client extends Model
     use SoftDeletes;
     protected $table = "client";
     protected $hidden = [
-        'remember_token','password','authentication_token'
+        'remember_token','password'
     ];
     protected $fillable = ['name','phone','nid','address'];
     protected $date = ['deleted_at'];

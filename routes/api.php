@@ -27,3 +27,5 @@ Route::post('delivery_request_transporter', 'DeliveryApiController@transporter')
 Route::post('client_registration_request', 'ClientApiController@Registration');
 Route::get('client_registration_request', 'ClientApiController@index');
 Route::post('client_login', 'ClientApiController@login');
+Route::post('transporter_registration', 'TransporterApiController@registration');
+Route::post('transporter_login', 'TransporterApiController@login');
