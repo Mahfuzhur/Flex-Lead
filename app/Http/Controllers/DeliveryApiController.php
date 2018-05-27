@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Delivery;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\GlobalController;
 
@@ -34,6 +35,39 @@ class DeliveryApiController extends Controller
         return response()->json([
             'code'=>'0000',
             'data'=>$article],200);
+    }
+
+    public function totalPrice(Request $request){
+        $weight = $request->header('weight');
+        $distance = $request->header('distance');
+
+        $base =40;
+        $totalCost = $base + ($weight * 10) + ($distance * 5);
+        return response()->json([
+            'code'=>'0000',
+            'data'=>$totalCost],200);
+    }
+    public function DeliveryRequestConfirmed(Request $request){
+        $cid = $request->header('cid');
+        $geoStartLatitude = $request->header('geoStartLatitude');
+        $geoStartLongitude = $request->header('geoStartLongitude');
+        $geoEndLatitude = $request->header('geoEndLatitude');
+        $geoEndLongitude  = $request->header('geoEndLongitude');
+        $toLocation = $request->header('toLocation');
+        $weight = $request->header('weight');
+        $receiverPhone = $request->header('receiverPhone');
+        $receiverName = $request->header('receiverName');
+        $whoWillPay = $request->header('whoWillPay');
+        $created_at = Carbon::now();
+
+
+        $data = array(
+            array('geoStartLatitude'=>$geoStartLatitude, 'cid'=>$cid,'geoStartLongitude'=>$geoStartLongitude,
+                'geoEndLatitude'=>$geoEndLatitude,'geoEndLongitude'=>$geoEndLongitude,'toLocation'=>$toLocation,
+                'weight'=>$weight,'receiverPhone'=>$receiverPhone,'receiverName'=>$receiverName,'whoWillPay'=>$whoWillPay,
+                'created_at' => $created_at)
+        );
+        $flag = Transporter::insert($data);
     }
 
     public function store(Request $request)
