@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use App\Transporter;
 use DB;
+use App\Delivery;
 
 
 class ClientApiController extends Controller
@@ -225,9 +226,24 @@ class ClientApiController extends Controller
     public function transporterSearch(Request $request)
     {
 
-        $lat = $request->header('lat');
-        $lng = $request->header('lng');
+        $lat = $request->header('geoStartLatitude');
+        $lng = $request->header('geoStartLongitude');
+        $endLat = $request->header('geoEndLatitude');
+        $endLng = $request->header('geoEndLongitude');
+        $weight = $request->header('weight');
+        $receiverName = $request->header('receiverName');
+        $receiverPhone = $request->header('receiverPhone');
+        $clientId = $request->header('clientId');
+        $payPerson = $request->header('payPerson');
+        $TotalPrice = $request->header('TotalPrice');
+        $createdAt = Carbon::now();
         $distance = 1;
+         $id = Delivery::insertGetId(['clientId'=>$clientId,'receiverName'=>$receiverName,
+            'receiverPhone'=>$receiverPhone,'geoStartLatitude'=>$lat,
+            'geoStartLongitude'=>$endLng,'geoEndLatitude'=>$endLat,
+            'geoEndLongitude'=>$endLng,'weight'=>$weight,'totalPrice'=>$TotalPrice,
+            'payPerson'=>$payPerson,'created_at'=>$createdAt]);
+
 
         $query = Transporter::getByDistance($lat, $lng, $distance);
 
@@ -242,7 +258,10 @@ class ClientApiController extends Controller
         //Extract the id's
         foreach($query as $q)
         {
-            array_push($ids, $q->id);
+            //array_push($ids, $q->id);
+            $tid = $q->id;
+            DB::table('service_request')->insert(['Tid'=>$tid,'Sid'=>$id]);
+
         }
 
         // Get the listings that match the returned ids
