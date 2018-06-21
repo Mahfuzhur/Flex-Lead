@@ -30,3 +30,6 @@ Route::post('client_login', 'ClientApiController@login');
 Route::post('transporter_registration', 'TransporterApiController@registration');
 Route::post('transporter_login', 'TransporterApiController@login');
 Route::post('totalPrice', 'DeliveryApiController@totalPrice');
+Route::post('distance', 'DeliveryApiController@distance');
+Route::post('transporter_request', 'ClientApiController@transporterSearch');
+Route::post('client_update', 'ClientApiController@update');

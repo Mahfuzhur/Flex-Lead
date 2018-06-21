@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use App\Client;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
-
+use App\Transporter;
+use DB;
 
 
 class ClientApiController extends Controller
@@ -93,12 +94,6 @@ class ClientApiController extends Controller
 //                    'data'=>'duplicate entry'],400);
                 return $e;
             }
-
-
-
-        //$article = Client::create($request->all());
-
-
 
     }
     public function login(Request $request)
@@ -196,20 +191,70 @@ class ClientApiController extends Controller
             }
         }
 
-
-
-
-
     }
 
 
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        $article = Client::findOrFail($id);
-        $article->update($request->all());
+        $name = $request->header('name');
+        $email = $request->header('email');
+        $phone = $request->header('phone');
+        $password = $request->header('password');
+        $address = $request->header('address');
+        $id = $request->header('id');
+        $user = Client::find($id);
+        $user->name = $name;
+        $user->email = $email;
+        $user->phone = $phone;
+        $user->password = bcrypt($password);
+        $user->address = $address;
 
-        return $article;
+        $flag = $user->save();
+        if($flag){
+            return response()->json([
+
+                'data' => 'updated'], 200);
+        }else{
+            return response()->json([
+
+                'data' => 'not found'], 204);
+        }
+
+    }
+    public function transporterSearch(Request $request)
+    {
+
+        $lat = $request->header('lat');
+        $lng = $request->header('lng');
+        $distance = 1;
+
+        $query = Transporter::getByDistance($lat, $lng, $distance);
+
+        if(empty($query)) {
+            return response()->json([
+                'code'=>'9999',
+                'data'=>'empty' ],200);
+        }
+
+        $ids = [];
+
+        //Extract the id's
+        foreach($query as $q)
+        {
+            array_push($ids, $q->id);
+        }
+
+        // Get the listings that match the returned ids
+        $results = DB::table('transporter')->whereIn( 'id', $ids)->orderBy('geoLan', 'ASC')->paginate(9999);
+
+        $articles = $results;
+
+//        return view('articles.index', compact('categories'))->withArticles($articles);
+        return response()->json([
+            'code'=>'0000',
+            'data'=>$ids],200);
+
     }
 
     public function delete(Request $request, $id)
