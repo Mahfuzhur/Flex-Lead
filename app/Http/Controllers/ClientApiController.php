@@ -238,7 +238,7 @@ class ClientApiController extends Controller
         $TotalPrice = $request->header('TotalPrice');
         $createdAt = Carbon::now();
         $distance = 1;
-         $id = Delivery::insertGetId(['clientId'=>$clientId,'receiverName'=>$receiverName,
+        $id = Delivery::insertGetId(['clientId'=>$clientId,'receiverName'=>$receiverName,
             'receiverPhone'=>$receiverPhone,'geoStartLatitude'=>$lat,
             'geoStartLongitude'=>$endLng,'geoEndLatitude'=>$endLat,
             'geoEndLongitude'=>$endLng,'weight'=>$weight,'totalPrice'=>$TotalPrice,
@@ -265,14 +265,18 @@ class ClientApiController extends Controller
         }
 
         // Get the listings that match the returned ids
-        $results = DB::table('transporter')->whereIn( 'id', $ids)->orderBy('geoLan', 'ASC')->paginate(9999);
+        //$results = DB::table('transporter')->whereIn( 'id', $ids)->orderBy('geoLan', 'ASC')->paginate(9999);
 
-        $articles = $results;
+        //$articles = $results;
 
 //        return view('articles.index', compact('categories'))->withArticles($articles);
+//        $tid = 8;
+//        while($tid != null){
+//            $tid = Delivery::select('deliveryTransporterId')->where([['id','=',12]])->get();
+//        }
+
         return response()->json([
-            'code'=>'0000',
-            'data'=>$ids],200);
+            'Delivery Id'=>$id],201);
 
     }
 
