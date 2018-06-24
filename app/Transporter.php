@@ -14,7 +14,7 @@ class Transporter extends Model
     protected $fillable = ['name','phone','nid','address','pic','dob','email'];
     protected $date = ['deleted_at'];
     protected $hidden = [
-        'remember_token','password'
+        'remember_token','password','authentication_token','nid'
     ];
     public static function getByDistance($lat, $lng, $distance)
     {

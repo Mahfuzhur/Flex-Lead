@@ -280,6 +280,33 @@ class ClientApiController extends Controller
 
     }
 
+    public function serviceResponse(Request $request){
+        $did = $request->header('did');
+        $tid = Delivery::select('deliveryTransporterId','status')->where([['id','=',$did]])->first();
+        $t_id = $tid->deliveryTransporterId;
+        $status = $tid->status;
+        if($status == 'found'){
+            $transporter = Transporter::join
+                ('delivarytransporter', 'delivarytransporter.transporterId', '=','transporter.id' )
+                ->select('transporter.*', 'delivarytransporter.id')
+                ->where([['transporter.id','=' ,1]])
+                //
+                ->get();
+            return response()->json([
+                'status' => 'found',
+                'transporter'=>$transporter],302);
+        }
+        elseif ($status = 'not found'){
+            return response()->json([
+                'status' => 'not found'],404);
+        }
+        elseif ($status = 'canceled'){
+            return response()->json([
+                'status' => 'canceled'],201);
+        }
+
+    }
+
     public function delete(Request $request, $id)
     {
         $article = Client::findOrFail($id);
