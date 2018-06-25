@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 use App\Transporter;
 use Carbon\Carbon;
+use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-
+use DB;
 class TransporterApiController extends Controller
 {
     public function Registration(Request $request)
@@ -148,7 +149,8 @@ class TransporterApiController extends Controller
                     return response()->json([
                         'code' => '0000',
                         'data' => $phone], 200);
-                } // idf some reason token is not updating returning ol token
+                }
+                // idf some reason token is not updating returning ol token
 //                elseif ($flag == 0) {
 //                    return response()->json([
 //                        'code' => '0000',
@@ -167,5 +169,74 @@ class TransporterApiController extends Controller
                     'data' => 'error'], 404);
             }
         }
+    }
+
+    public function serviceSearch(Request $request){
+        $tId = $request->header('tId');
+        $lat = $request->header('lat');
+        $lon = $request->header('lon');
+        //$service = $request->header('service');
+        $flag = $request->header('serviceFlag');
+
+        if ($flag == 0){
+            $transporter = Transporter::find($tId);
+            $transporter->geoLat = $lat;
+            $transporter->geoLan = $lon;
+
+            $transporter->save();
+        }
+        if ($flag == 1){
+            $transporter = Transporter::find($tId);
+            $transporter->geoLat = $lat;
+            $transporter->geoLan = $lon;
+
+            $transporter->save();
+
+            $result = DB::table('service_request')
+                ->select('id','Tid','Sid','tableId')
+                ->where([['Tid','=',$tId]])
+                ->first();
+            if($result != null){
+                $sId = $result->Sid;
+                $cId = $result->id;
+                $tableId = $result->tableId;
+                $allId = DB::table('service_request')
+                    ->select('id')
+                    ->where([['Sid','=',$sId]])
+                    ->get();
+                foreach ($allId as $id){
+
+                    if($cId>$id->id){
+                        return response()->json(
+                            [
+                                'status' => 'bigger'
+                            ],404
+                        );
+
+                    }
+                    return response()->json(
+                        [
+                            'status' => 'found',
+                            'id' => $cId,
+                            'serviceId'=>$sId,
+                            'tableId'=>$tableId
+                        ],302
+                    );
+                }
+            }
+            elseif ($result == null){
+                return response()->json(
+                    [
+                        'status'=>'no service'
+                    ],404
+                );
+            }
+        }
+
+    }
+
+    public function transporterServiceConfirmation(Request $request){
+
+        
     }
 }

@@ -237,20 +237,19 @@ class ClientApiController extends Controller
         $payPerson = $request->header('payPerson');
         $TotalPrice = $request->header('TotalPrice');
         $createdAt = Carbon::now();
-        $distance = 1;
+        $distance = 10;
         $id = Delivery::insertGetId(['clientId'=>$clientId,'receiverName'=>$receiverName,
             'receiverPhone'=>$receiverPhone,'geoStartLatitude'=>$lat,
             'geoStartLongitude'=>$endLng,'geoEndLatitude'=>$endLat,
             'geoEndLongitude'=>$endLng,'weight'=>$weight,'totalPrice'=>$TotalPrice,
-            'payPerson'=>$payPerson,'created_at'=>$createdAt]);
+            'payPerson'=>$payPerson,'created_at'=>$createdAt,'status'=>'not found']);
 
 
         $query = Transporter::getByDistance($lat, $lng, $distance);
 
         if(empty($query)) {
             return response()->json([
-                'code'=>'9999',
-                'data'=>'empty' ],200);
+                'data'=>'empty' ],404);
         }
 
         $ids = [];
@@ -260,7 +259,8 @@ class ClientApiController extends Controller
         {
             //array_push($ids, $q->id);
             $tid = $q->id;
-            DB::table('service_request')->insert(['Tid'=>$tid,'Sid'=>$id]);
+            //table id 1 is delivery table
+            DB::table('service_request')->insert(['Tid'=>$tid,'Sid'=>$id,'tableId'=>1]);
 
         }
 

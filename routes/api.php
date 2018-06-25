@@ -34,5 +34,6 @@ Route::post('distance', 'DeliveryApiController@distance');
 Route::post('delivery_transporter_request', 'ClientApiController@transporterSearch');
 Route::post('client_update', 'ClientApiController@update');
 Route::post('delivery_service_response', 'ClientApiController@serviceResponse');
+Route::post('delivery_service_request', 'TransporterApiController@serviceSearch');
 
 
