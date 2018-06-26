@@ -260,7 +260,7 @@ class ClientApiController extends Controller
             //array_push($ids, $q->id);
             $tid = $q->id;
             //table id 1 is delivery table
-            DB::table('service_request')->insert(['Tid'=>$tid,'Sid'=>$id,'tableId'=>1]);
+            DB::table('service_request')->insert(['Tid'=>$tid,'Sid'=>$id,'tableId'=> 1]);
 
         }
 
@@ -289,20 +289,20 @@ class ClientApiController extends Controller
             $transporter = Transporter::join
                 ('delivarytransporter', 'delivarytransporter.transporterId', '=','transporter.id' )
                 ->select('transporter.*', 'delivarytransporter.id')
-                ->where([['transporter.id','=' ,1]])
+                ->where([['transporter.id','=' ,$t_id]])
                 //
                 ->get();
             return response()->json([
                 'status' => 'found',
-                'transporter'=>$transporter],302);
+                'transporter'=>$transporter],200);
         }
         elseif ($status = 'not found'){
             return response()->json([
-                'status' => 'not found'],404);
+                'status' => 'not found'],200);
         }
         elseif ($status = 'canceled'){
             return response()->json([
-                'status' => 'canceled'],201);
+                'status' => 'canceled'],200);
         }
 
     }

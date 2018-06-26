@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Delivery;
 use App\Transporter;
 use Carbon\Carbon;
 use Illuminate\Contracts\Encryption\EncryptException;
@@ -237,6 +238,56 @@ class TransporterApiController extends Controller
 
     public function transporterServiceConfirmation(Request $request){
 
-        
+        $foundId = $request->header('foundId');
+        $flag = $request->header('flag');
+        // 1= accepted by
+        if($flag == 1){
+             $result = DB::table('service_request')->find($foundId);
+             if($result != null){
+                 $sId = $result-> Sid;
+                 $tId = $result->Tid;
+                 $tableId = $result->tableId;
+                 //$result->delete();
+                 DB::table('service_request')->where([['Sid','=',$sId]])->delete();
+                 DB::table('service_request')->where([['Tid','=',$tId]])->delete();
+
+                 $transporterStatusUpdate = Transporter::find($tId);
+                 //1 = on service
+                 $transporterStatusUpdate->status = 1;
+                 $transporterStatusUpdate->save();
+
+                 $deliveryTableUpdate = Delivery::find($sId);
+
+                 $deliveryTableUpdate->deliveryTransporterId = $tId;
+                 $deliveryTableUpdate->startTime = Carbon::now()->addHour(6);
+                 $deliveryTableUpdate->save();
+                 return response()->json([
+                     'status'=>'success',
+                     'data' => $deliveryTableUpdate
+                 ],200
+                 );
+             }
+             else{
+                 return response()->json([
+                     'status'=>'id not found'
+                    ],404
+                 );
+             }
+
+        }
+        // 2= canceled
+        elseif ($flag == 2){
+            $result = DB::table('service_request')->find($foundId);
+            $sId = $result-> Sid;
+            $tId = $result->Tid;
+            $tableId = $result->tableId;
+            //$result->delete();
+            DB::table('service_request')->where([['Tid','=',$tId],['Sid','=',$sId]])->delete();
+            return response()->json(200
+            );
+        }
+        elseif ($flag == 2){
+
+        }
     }
 }
