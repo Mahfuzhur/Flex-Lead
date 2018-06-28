@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Client;
+use App\Delivery;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use App\Transporter;
 use DB;
-use App\Delivery;
+
 
 
 class ClientApiController extends Controller
@@ -45,13 +46,13 @@ class ClientApiController extends Controller
         $name = $request->header('name');
         $email = $request->header('email');
         $phone = $request->header('phone');
-         //$check = $request->header('password');
+        //$check = $request->header('password');
         $password = bcrypt($request->header('password'));
         $address = $request->header('address');
         $authentication_token = bcrypt($password);
         $created_at = Carbon::now();
         $status = 0;
-         //$hpass = bcrypt($password);
+        //$hpass = bcrypt($password);
 //        if (Hash::check($check, $password))
 //        {
 //            $flag=0;
@@ -68,33 +69,36 @@ class ClientApiController extends Controller
 //                'data'=>$o_phone],400);
 //        }
 
-            try{
-                $data = array(
-                    array('name'=>$name, 'email'=>$email,'phone'=>$phone,'password'=>$password,'address'=>$address,'authentication_token'=>$authentication_token,'created_at'=>$created_at,'status'=>$status)
-                );
+        try{
+            $data = array(
+                array('name'=>$name, 'email'=>$email,'phone'=>$phone,'password'=>$password,'address'=>$address,'authentication_token'=>$authentication_token,'created_at'=>$created_at,'status'=>$status)
+            );
 
-                 $flag = Client::insert($data);
-                if($flag){
-                    $client = Client::select('id','authentication_token')
-                        ->where([['phone','=',$phone]])
-                        ->get();
-                    return response()->json([
-                        'code'=>'0000',
-                        'data'=>$client],201);
+            $flag = Client::insert($data);
+            if($flag){
+                $client = Client::select('id','authentication_token')->where([['phone','=',$phone]])->get();
+                return response()->json([
+                    'code'=>'0000',
+                    'data'=>$client],201);
 
-                }else{
-                    return response()->json([
-                        'code'=>'0000',
-                        'data'=>'not found'],404);
-                }
-
+            }else{
+                return response()->json([
+                    'code'=>'0000',
+                    'data'=>'not found'],404);
             }
-            catch(QueryException $e){
-//                return response()->json([
-//                    'code'=>'9999',
-//                    'data'=>'duplicate entry'],400);
-                return $e;
-            }
+
+        }
+        catch(QueryException $e){
+            return response()->json([
+                'code'=>'9999',
+                'data'=>'duplicate entry'],400);
+        }
+
+
+
+        //$article = Client::create($request->all());
+
+
 
     }
     public function login(Request $request)
@@ -131,11 +135,11 @@ class ClientApiController extends Controller
             //checking hash password and authentication token
             if (Hash::check( $password,$o_password))
             {
-                    //by crypting authentication token
+                //by crypting authentication token
                 $authentication_token = bcrypt($o_authentication_token);
-                    //updating authentication token
+                //updating authentication token
                 $flag = Client::where([['email','=', $user_input]])->update(array('authentication_token' => $authentication_token));
-                    // token is updated returning new token
+                // token is updated returning new token
                 if($flag == 1){
                     return response()->json([
                         'code'=>'0000',
@@ -194,8 +198,6 @@ class ClientApiController extends Controller
 
     }
 
-
-
     public function update(Request $request)
     {
         $name = $request->header('name');
@@ -240,7 +242,7 @@ class ClientApiController extends Controller
         $distance = 10;
         $id = Delivery::insertGetId(['clientId'=>$clientId,'receiverName'=>$receiverName,
             'receiverPhone'=>$receiverPhone,'geoStartLatitude'=>$lat,
-            'geoStartLongitude'=>$endLng,'geoEndLatitude'=>$endLat,
+            'geoStartLongitude'=>$lng,'geoEndLatitude'=>$endLat,
             'geoEndLongitude'=>$endLng,'weight'=>$weight,'totalPrice'=>$TotalPrice,
             'payPerson'=>$payPerson,'created_at'=>$createdAt,'status'=>'not found']);
 
@@ -282,18 +284,19 @@ class ClientApiController extends Controller
 
     public function serviceResponse(Request $request){
         $did = $request->header('did');
-        $tid = Delivery::select('deliveryTransporterId','status')->where([['id','=',$did]])->first();
+        $tid = Delivery::where([['id','=',$did]])->first();
         $t_id = $tid->deliveryTransporterId;
         $status = $tid->status;
         if($status == 'found'){
             $transporter = Transporter::join
-                ('delivarytransporter', 'delivarytransporter.transporterId', '=','transporter.id' )
+            ('delivarytransporter', 'delivarytransporter.transporterId', '=','transporter.id' )
                 ->select('transporter.*', 'delivarytransporter.id')
                 ->where([['transporter.id','=' ,$t_id]])
-                //
-                ->get();
+                ->first();
+
             return response()->json([
                 'status' => 'found',
+                'delivery'=>$tid,
                 'transporter'=>$transporter],200);
         }
         elseif ($status = 'not found'){
@@ -306,6 +309,15 @@ class ClientApiController extends Controller
         }
 
     }
+
+
+    // public function update(Request $request, $id)
+    // {
+    //     $article = Client::findOrFail($id);
+    //     $article->update($request->all());
+
+    //     return $article;
+    // }
 
     public function delete(Request $request, $id)
     {

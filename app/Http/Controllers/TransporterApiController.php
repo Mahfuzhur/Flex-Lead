@@ -1,14 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Delivery;
 use App\Transporter;
+use App\Delivery;
 use Carbon\Carbon;
-use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use DB;
+
 class TransporterApiController extends Controller
 {
     public function Registration(Request $request)
@@ -44,24 +44,14 @@ class TransporterApiController extends Controller
 
         try{
             $data = array(
-                array('name'=>$name, 'email'=>$email,'phone'=>$phone,'nid'=>$nid,'dob'=>$dob,'pic'=>$pic,'address'=>$address,'password'=>$password,'authentication_token'=>$authentication_token,'created_at'=>$created_at,'status'=>$status)
+                array('name'=>$name, 'email'=>$email,'phone'=>$phone,'nid'=>$nid,'dob'=>$dob,'pic'=>$pic,'address'=>$address,'password'=>$password,'authentication_token'=>$authentication_token,'created_at'=>$created_at,'status' => $status)
             );
             $flag = Transporter::insert($data);
             if($flag){
-                try{
-                    $transporter = Transporter::select('id','authentication_token')
-                        ->where([['nid','=',$nid]])
-                        ->get();
-                    return response()->json([
-                        'code'=>'0000',
-                        'data'=>$transporter],201);
-                }
-                catch (QueryException $e){
-
-
-                }
-
-
+                $transporter = Transporter::select('id','authentication_token')->where([['nid','=',$nid]])->get();
+                return response()->json([
+                    'code'=>'0000',
+                    'data'=>$transporter],201);
             }
             else{
                 return response()->json([
@@ -71,9 +61,9 @@ class TransporterApiController extends Controller
 
         }
         catch(QueryException $e){
-//            return response()->json([
-//                'code'=>'9999',
-//                'data'=>'duplicate entry'],400);
+            // return response()->json([
+            //     'code'=>'9999',
+            //     'data'=>'duplicate entry'],400);
             return $e;
         }
         //$article = Client::create($request->all());
@@ -130,7 +120,7 @@ class TransporterApiController extends Controller
                 else{
                     return response()->json([
                         'code'=>'9999',
-                        'data'=>'error'],404);
+                        'data'=>'error'],200);
                 }
 
             }
@@ -150,8 +140,7 @@ class TransporterApiController extends Controller
                     return response()->json([
                         'code' => '0000',
                         'data' => $phone], 200);
-                }
-                // idf some reason token is not updating returning ol token
+                } // idf some reason token is not updating returning ol token
 //                elseif ($flag == 0) {
 //                    return response()->json([
 //                        'code' => '0000',
@@ -161,13 +150,13 @@ class TransporterApiController extends Controller
                 else {
                     return response()->json([
                         'code' => '9999',
-                        'data' => 'error'], 404);
+                        'data' => 'error'], 200);
                 }
             }
             else{
                 return response()->json([
                     'code' => '9999',
-                    'data' => 'error'], 404);
+                    'data' => 'error'], 200);
             }
         }
     }
@@ -242,37 +231,38 @@ class TransporterApiController extends Controller
         $flag = $request->header('flag');
         // 1= accepted by
         if($flag == 1){
-             $result = DB::table('service_request')->find($foundId);
-             if($result != null){
-                 $sId = $result-> Sid;
-                 $tId = $result->Tid;
-                 $tableId = $result->tableId;
-                 //$result->delete();
-                 DB::table('service_request')->where([['Sid','=',$sId]])->delete();
-                 DB::table('service_request')->where([['Tid','=',$tId]])->delete();
+            $result = DB::table('service_request')->find($foundId);
+            if($result != null){
+                $sId = $result-> Sid;
+                $tId = $result->Tid;
+                $tableId = $result->tableId;
+                //$result->delete();
+                DB::table('service_request')->where([['Sid','=',$sId]])->delete();
+                DB::table('service_request')->where([['Tid','=',$tId]])->delete();
 
-                 $transporterStatusUpdate = Transporter::find($tId);
-                 //1 = on service
-                 $transporterStatusUpdate->status = 1;
-                 $transporterStatusUpdate->save();
+                $transporterStatusUpdate = Transporter::find($tId);
+                //1 = on service
+                $transporterStatusUpdate->status = 1;
+                $transporterStatusUpdate->save();
 
-                 $deliveryTableUpdate = Delivery::find($sId);
+                $deliveryTableUpdate = Delivery::find($sId);
 
-                 $deliveryTableUpdate->deliveryTransporterId = $tId;
-                 $deliveryTableUpdate->startTime = Carbon::now()->addHour(6);
-                 $deliveryTableUpdate->save();
-                 return response()->json([
-                     'status'=>'success',
-                     'data' => $deliveryTableUpdate
-                 ],200
-                 );
-             }
-             else{
-                 return response()->json([
-                     'status'=>'id not found'
-                    ],404
-                 );
-             }
+                $deliveryTableUpdate->deliveryTransporterId = $tId;
+                $deliveryTableUpdate->startTime = Carbon::now()->addHour(6);
+                $deliveryTableUpdate->status = 'found';
+                $deliveryTableUpdate->save();
+                return response()->json([
+                    'status'=>'success',
+                    'data' => $deliveryTableUpdate
+                ],200
+                );
+            }
+            else{
+                return response()->json([
+                    'status'=>'id not found'
+                ],404
+                );
+            }
 
         }
         // 2= canceled
