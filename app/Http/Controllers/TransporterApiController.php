@@ -48,7 +48,7 @@ class TransporterApiController extends Controller
             );
             $flag = Transporter::insert($data);
             if($flag){
-                $transporter = Transporter::select('id','authentication_token')->where([['nid','=',$nid]])->get();
+                $transporter = Transporter::select('id','authentication_token')->where([['nid','=',$nid]])->first();
                 return response()->json([
                     'code'=>'0000',
                     'data'=>$transporter],201);
@@ -64,7 +64,12 @@ class TransporterApiController extends Controller
             // return response()->json([
             //     'code'=>'9999',
             //     'data'=>'duplicate entry'],400);
-            return $e;
+            $errorCode = $e->errorInfo[1];
+            if($errorCode == '1062'){
+                dd('Duplicate Entry');
+                return response()->json($errorCode);
+            }
+            //
         }
         //$article = Client::create($request->all());
     }
@@ -76,7 +81,7 @@ class TransporterApiController extends Controller
         $password = $request->header('password');
 
         try{
-            $phone = Transporter::select()
+            $phone = Transporter::select('password','authentication_token','id','name','phone','email','dob','address','nid','pic','dtId')
                 ->where([['phone','=', $user_input]])
                 ->first();
         }catch (QueryException $e){

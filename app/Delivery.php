@@ -4,7 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use DB;
 
 class Delivery extends Model
 {
@@ -56,6 +55,4 @@ class Delivery extends Model
     public function setDueAttribute($value){
         $this->attributes['due'] = ($value);
     }
-
-
 }

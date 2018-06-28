@@ -24,5 +24,5 @@ class Client extends Model
         $this->attributes['nid'] = ($value);
     }public function setAddressAttribute($value){
     $this->attributes['address'] = ($value);
-    }
+}
 }

@@ -5,7 +5,6 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use DB;
-
 class Transporter extends Model
 {
     use SoftDeletes;
@@ -22,4 +21,5 @@ class Transporter extends Model
 
         return $results;
     }
+
 }
