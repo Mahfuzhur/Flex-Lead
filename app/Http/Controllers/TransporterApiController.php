@@ -19,28 +19,11 @@ class TransporterApiController extends Controller
         $nid = $request->header('nid');
         $dob = $request->header('dob');
         $pic = $request->header('pic');
-        //$check = $request->header('password');
         $password = bcrypt($request->header('password'));
         $address = $request->header('address');
         $authentication_token = bcrypt($password);
         $created_at = Carbon::now();
         $status = 0;
-        //$hpass = bcrypt($password);
-//        if (Hash::check($check, $password))
-//        {
-//            $flag=0;
-//        }
-//        try{
-//            $o_email = Client::findOrFail($email);
-//            $o_phone = Client::findOrFail($phone);
-//            return response()->json([
-//                'code'=>$o_email,
-//                'data'=>$o_phone],201);
-//        }catch (QueryException $e){
-//            return response()->json([
-//                'code'=>$o_email,
-//                'data'=>$o_phone],400);
-//        }
 
         try{
             $data = array(
@@ -61,17 +44,11 @@ class TransporterApiController extends Controller
 
         }
         catch(QueryException $e){
-            // return response()->json([
-            //     'code'=>'9999',
-            //     'data'=>'duplicate entry'],400);
-            $errorCode = $e->errorInfo[1];
-            if($errorCode == '1062'){
-                dd('Duplicate Entry');
-                return response()->json($errorCode);
-            }
-            //
+
+            return response()->json(['status'=>'duplicate'],200);
+
         }
-        //$article = Client::create($request->all());
+
     }
 
     public function login(Request $request)
@@ -94,8 +71,6 @@ class TransporterApiController extends Controller
         }catch (QueryException $e){
 
         }
-
-
 
         if(!$email == null){
             //getting phone and email from database
@@ -271,7 +246,7 @@ class TransporterApiController extends Controller
 
         }
         // 2= canceled
-        elseif ($flag == 2){
+        elseif ($flag == 0){
             $result = DB::table('service_request')->find($foundId);
             $sId = $result-> Sid;
             $tId = $result->Tid;
@@ -284,5 +259,35 @@ class TransporterApiController extends Controller
         elseif ($flag == 2){
 
         }
+    }
+
+    public function pickUpStatus(Request $request){
+        $dId = $request->header('dId');
+        $flag = $request->header('flag');
+        if($flag == 'no flag'){
+            $result = Delivery::find($dId);
+
+            return response()->json([
+                'data' => $result,
+            ],200);
+        }
+        elseif ($flag == 'picked'){
+            $result = Delivery::find($dId);
+            $result-> status = $flag;
+            $result->save();
+
+            return response()->json([
+                'data' => $result
+            ],200);
+        }
+        elseif ($flag == 'end')
+            $result = Delivery::find($dId);
+            $result-> status = $flag;
+            $result-> endTime = Carbon::now()->addHour(6);
+            $result->save();
+
+            return response()->json([
+                'data' => $result
+            ],200);
     }
 }
