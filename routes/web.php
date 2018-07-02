@@ -30,3 +30,7 @@ Route::get('/client/show/{id}', 'clientController@show');
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index');

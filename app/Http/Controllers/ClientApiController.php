@@ -16,6 +16,7 @@ class ClientApiController extends Controller
 {
     public function index()
     {
+
         $article = Client::select('name','phone')->get();
 
         return response()->json([
@@ -25,8 +26,8 @@ class ClientApiController extends Controller
 
     public function show($id)
     {
-        $article = Client::find($id);
 
+        $article = Client::find($id);
         return response()->json([
             'code'=>'00000',
             'data'=>$article],201);
@@ -34,10 +35,7 @@ class ClientApiController extends Controller
     public function transporter(Request $request)
     {
 //        $tid = $request->header('tid');
-        $article = Client::select('id','receiverName','receiverPhone','geoStartLatitude',
-            'geoStartLongitude','geoEndLatitude','geoEndLongitude','weight')
-            ->where('deliveryTransporterId', 1)->get();
-
+        $article = Client::select('id','receiverName','receiverPhone','geoStartLatitude','geoStartLongitude','geoEndLatitude','geoEndLongitude','weight')->where('deliveryTransporterId', 1)->get();
         return response()->json([
             'code'=>'0000',
             'data'=>$article],200);
@@ -73,21 +71,17 @@ class ClientApiController extends Controller
 
         try{
             $data = array(
-                array('name'=>$name, 'email'=>$email,'phone'=>$phone,'password'=>$password,
-                    'address'=>$address,'authentication_token'=>$authentication_token,'created_at'=>$created_at,
-                    'status'=>$status)
+                array('name'=>$name, 'email'=>$email,'phone'=>$phone,'password'=>$password,'address'=>$address,'authentication_token'=>$authentication_token,'created_at'=>$created_at,'status'=>$status)
             );
 
             $flag = Client::insert($data);
             if($flag){
                 $client = Client::select('id','authentication_token')->where([['phone','=',$phone]])->get();
-
                 return response()->json([
                     'code'=>'0000',
                     'data'=>$client],201);
 
             }else{
-
                 return response()->json([
                     'code'=>'0000',
                     'data'=>'not found'],404);
@@ -95,13 +89,16 @@ class ClientApiController extends Controller
 
         }
         catch(QueryException $e){
-
             return response()->json([
                 'code'=>'9999',
                 'data'=>'duplicate entry'],400);
         }
 
+
+
         //$article = Client::create($request->all());
+
+
 
     }
     public function login(Request $request)
@@ -127,6 +124,8 @@ class ClientApiController extends Controller
         }catch (QueryException $e){
 
         }
+
+
 
         if(!$email == null){
             //getting phone and email from database
@@ -312,6 +311,13 @@ class ClientApiController extends Controller
     }
 
 
+    // public function update(Request $request, $id)
+    // {
+    //     $article = Client::findOrFail($id);
+    //     $article->update($request->all());
+
+    //     return $article;
+    // }
 
     public function delete(Request $request, $id)
     {

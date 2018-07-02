@@ -33,9 +33,13 @@ Route::post('delivery_transporter_request', 'ClientApiController@transporterSear
 Route::post('client_update', 'ClientApiController@update');
 Route::post('delivery_service_response', 'ClientApiController@serviceResponse');
 //transporter api routes
-Route::post('service_request', 'TransporterApiController@serviceSearch');
+Route::post('delivery_service_request', 'TransporterApiController@serviceSearch');
 Route::post('delivery_service_confirmation', 'TransporterApiController@transporterServiceConfirmation');
 Route::post('transporter_registration', 'TransporterApiController@registration');
+<<<<<<< HEAD
 Route::post('transporter_login', 'TransporterApiController@login');
 Route::post('pick_up_status', 'TransporterApiController@pickUpStatus');
 Route::post('delivery_service_request', 'TransporterApiController@serviceSearch');
+=======
+Route::post('transporter_login', 'TransporterApiController@login');
+>>>>>>> parent of 692fea3... pick up status

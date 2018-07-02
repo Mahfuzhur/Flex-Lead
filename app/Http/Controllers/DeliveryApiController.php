@@ -14,6 +14,7 @@ class DeliveryApiController extends Controller
 {
     public function index()
     {
+
         $article = Delivery::select('receiverName','receiverPhone')->get();
 
         return response()->json([
@@ -32,9 +33,7 @@ class DeliveryApiController extends Controller
     public function transporter(Request $request)
     {
 //        $tid = $request->header('tid');
-        $article = Delivery::select('id','receiverName','receiverPhone','geoStartLatitude',
-            'geoStartLongitude','geoEndLatitude','geoEndLongitude','weight')
-            ->where([['deliveryTransporterId','=', 1],['ClientId','=',1]])->get();
+        $article = Delivery::select('id','receiverName','receiverPhone','geoStartLatitude','geoStartLongitude','geoEndLatitude','geoEndLongitude','weight')->where([['deliveryTransporterId','=', 1],['ClientId','=',1]])->get();
         return response()->json([
             'code'=>'0000',
             'data'=>$article],200);
@@ -63,6 +62,7 @@ class DeliveryApiController extends Controller
         $whoWillPay = $request->header('whoWillPay');
         $created_at = Carbon::now();
 
+
         $data = array(
             array('geoStartLatitude'=>$geoStartLatitude, 'cid'=>$cid,'geoStartLongitude'=>$geoStartLongitude,
                 'geoEndLatitude'=>$geoEndLatitude,'geoEndLongitude'=>$geoEndLongitude,'toLocation'=>$toLocation,
@@ -74,8 +74,10 @@ class DeliveryApiController extends Controller
 
     public function store(Request $request)
     {
+
         $val = $request->header('id');
         $article = Delivery::create($request->all());
+
 
         return response()->json([
             'code'=>$val,
@@ -126,6 +128,7 @@ class DeliveryApiController extends Controller
 
     public function transporterSearch(Request $request)
     {
+
         $lat = $request->header('lat');
         $lng = $request->header('lng');
         $distance = 1;
