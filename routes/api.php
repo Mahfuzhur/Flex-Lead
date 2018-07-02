@@ -37,13 +37,9 @@ Route::post('delivery_service_request', 'TransporterApiController@serviceSearch'
 Route::post('delivery_service_confirmation', 'TransporterApiController@transporterServiceConfirmation');
 Route::post('transporter_registration', 'TransporterApiController@registration');
 <<<<<<< HEAD
-<<<<<<< HEAD
 Route::post('transporter_login', 'TransporterApiController@login');
 Route::post('pick_up_status', 'TransporterApiController@pickUpStatus');
 Route::post('delivery_service_request', 'TransporterApiController@serviceSearch');
-=======
-Route::post('transporter_login', 'TransporterApiController@login');
->>>>>>> parent of 692fea3... pick up status
 =======
 Route::post('transporter_login', 'TransporterApiController@login');
 >>>>>>> parent of 692fea3... pick up status
