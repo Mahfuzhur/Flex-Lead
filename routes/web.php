@@ -14,4 +14,19 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
 Route::resource('/delivery', 'DeliveryController');
+Route::resource('/client', 'ClientController');
+Route::resource('/dashboard', 'DashboardController');
+Route::resource('/transporter', 'TransporterController');
+Route::get('/transporter/show/{id}', 'TransporterController@show');
+Route::get('/client/show/{id}', 'clientController@show');
+
+
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index');

@@ -38,3 +38,4 @@ Route::post('delivery_service_confirmation', 'TransporterApiController@transport
 Route::post('transporter_registration', 'TransporterApiController@registration');
 Route::post('transporter_login', 'TransporterApiController@login');
 Route::post('pick_up_status', 'TransporterApiController@pickUpStatus');
+Route::post('delivery_service_request', 'TransporterApiController@serviceSearch');
